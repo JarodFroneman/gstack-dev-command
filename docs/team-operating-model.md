@@ -1,10 +1,18 @@
-# gstack Virtual Engineering Team
+# JStack Virtual Engineering Team
 
 ## Principle
 
-`/gstack-dev` is a lead-agent workflow. The Lead Engineer owns scope,
-dispatch, implementation decisions, verification, and handoff. Specialists
-reduce risk; they do not replace accountability.
+JStack is a lead-agent workflow. The Lead Engineer owns scope, dispatch,
+implementation decisions, verification, and handoff. Specialists reduce risk;
+they do not replace accountability.
+
+## Command Modes
+
+- `/j-stack-dev`: Lead Engineer only unless the user separately asks for
+  subagents in the same prompt.
+- `/jstack-subagents`: Lead Engineer plus the right specialist team, normally
+  2-3 specialists.
+- `/jstack-full-team`: Lead Engineer plus the full 11-role roster.
 
 ## Default Roster
 
@@ -25,7 +33,7 @@ reduce risk; they do not replace accountability.
 - Trivial or one-file local work: Lead only.
 - Normal bug/feature: Lead + Investigator + Reviewer.
 - Phase, milestone, project, or broad roadmap work: Lead + Investigator +
-  Reviewer when multi-agent tools are available.
+  Reviewer, plus QA when verification risk is meaningful.
 - Broad implementation: add Builder with disjoint write scope.
 - Architecture/API/database/integration: add Architect.
 - UI/product: add Product / UX and QA.
@@ -36,13 +44,9 @@ reduce risk; they do not replace accountability.
 
 ## Hard Limits
 
-- Default maximum: three specialists.
-- More than three specialists requires a lead justification.
-- For phase/milestone/project work, architecture-sensitive work,
-  security/compliance-sensitive work, production/release work, UI/product work,
-  quant/data/financial work, or difficult debugging, the Lead must either spawn
-  specialists or explicitly state `No subagents deployed:` with the concrete
-  reason.
+- `/jstack-subagents` should normally use two or three specialists.
+- `/jstack-full-team` may use all 11 roles. If concurrency limits apply, dispatch
+  the team in waves.
 - Subagents are read-only by default.
 - Only one writer may own a file/module scope.
 - Subagents must not spawn other subagents.

@@ -1,48 +1,56 @@
-# gstack-dev Command
+# JStack Commands
 
-Enterprise Codex workflow command, skill, MCP server, and policy templates for
-production-grade software work.
+Custom Codex slash commands, skill, MCP server, and policy templates for
+enterprise-grade software work.
 
-`/gstack-dev` is designed to act like a virtual engineering team:
+JStack is our project-specific wrapper around the upstream gstack workflow. The
+user-facing command surface is JStack; upstream gstack skills remain available
+as implementation building blocks where useful.
 
-- one accountable Lead Engineer
-- conditional specialists for architecture, investigation, build, review, QA,
-  security, release, product/UX, quant/backtest, and documentation
-- policy-as-code checks
-- preflight gates
-- release-readiness gates
-- quant/backtest validation gates
-- mastery training from beginner to expert
+## Commands
+
+- `/j-stack-dev` - single Lead Engineer workflow; no subagents by default.
+- `/jstack-subagents` - Lead Engineer plus the right specialist team, normally
+  2-3 specialists.
+- `/jstack-full-team` - full 11-role JStack team for major, high-risk, or
+  explicitly requested full-team work.
 
 ## Included
 
-- `prompts/gstack-dev.md` - Codex custom slash command.
-- `skills/gstack-dev/SKILL.md` - full operating workflow and mastery system.
-- `mcp/gstack/gstack_mcp_server.py` - local stdio MCP server.
-- `mcp/gstack/templates/` - enterprise policy, release, PR, team, and quant templates.
-- `examples/gstack.enterprise.json` - starter project policy.
+- `prompts/j-stack-dev.md` - single-lead slash command.
+- `prompts/jstack-subagents.md` - smart specialist-team slash command.
+- `prompts/jstack-full-team.md` - full-team slash command.
+- `skills/jstack-dev/SKILL.md` - full operating workflow and mastery system.
+- `mcp/jstack/jstack_mcp_server.py` - local stdio MCP server.
+- `mcp/jstack/templates/` - enterprise policy, release, PR, team, and quant templates.
+- `examples/jstack.enterprise.json` - starter project policy.
 - `scripts/install.py` - cross-platform installer for Codex.
 - `scripts/install.ps1` - Windows PowerShell wrapper.
 
 ## MCP Tools
 
-- `gstack_detect_project`
-- `gstack_list_skills`
-- `gstack_read_skill`
-- `gstack_plan`
-- `gstack_team_plan`
-- `gstack_dispatch_check`
-- `gstack_policy_check`
-- `gstack_preflight`
-- `gstack_health`
-- `gstack_review`
-- `gstack_security_audit`
-- `gstack_qa`
-- `gstack_context_save`
-- `gstack_context_restore`
-- `gstack_ship_check`
-- `gstack_release_readiness`
-- `gstack_quant_backtest_review`
+The JStack MCP exposes `jstack_*` tools:
+
+- `jstack_detect_project`
+- `jstack_list_skills`
+- `jstack_read_skill`
+- `jstack_plan`
+- `jstack_team_plan`
+- `jstack_dispatch_check`
+- `jstack_policy_check`
+- `jstack_preflight`
+- `jstack_health`
+- `jstack_review`
+- `jstack_security_audit`
+- `jstack_qa`
+- `jstack_context_save`
+- `jstack_context_restore`
+- `jstack_ship_check`
+- `jstack_release_readiness`
+- `jstack_quant_backtest_review`
+
+Legacy `gstack_*` tool aliases are retained for compatibility, but new prompts
+and docs should use `jstack_*`.
 
 ## Install
 
@@ -64,13 +72,13 @@ tools reload.
 ## Smoke Test
 
 ```powershell
-python .\mcp\gstack\smoke_test.py
+python .\mcp\jstack\smoke_test.py
 ```
 
 Expected:
 
 ```text
-gstack MCP smoke test passed
+jstack MCP smoke test passed
 ```
 
 ## Project Policy
@@ -78,20 +86,23 @@ gstack MCP smoke test passed
 Copy this into a project root and customize it:
 
 ```text
-examples/gstack.enterprise.json
+examples/jstack.enterprise.json
 ```
 
 The MCP will look for:
 
-- `gstack.enterprise.json`
-- `gstack.policy.json`
-- `gstack.yml`
-- `.gstack/gstack.enterprise.json`
-- `.gstack/gstack.yml`
+- `jstack.enterprise.json`
+- `jstack.policy.json`
+- `jstack.yml`
+- `.jstack/jstack.enterprise.json`
+- `.jstack/jstack.yml`
+
+Legacy `gstack.*` policy files are still accepted so existing projects do not
+break during migration.
 
 ## Operating Standard
 
-Small tasks stay single-agent. Complex tasks use a controlled lead-plus-
+Small tasks stay single-lead. Complex tasks use a controlled lead-plus-
 specialists model. Specialists are read-only by default. Any editing specialist
 must have a disjoint write scope. The Lead Engineer owns final synthesis,
 verification, and handoff.

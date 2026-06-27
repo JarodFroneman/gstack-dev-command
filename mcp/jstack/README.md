@@ -1,28 +1,28 @@
-# gstack MCP
+﻿# JStack MCP
 
-Local stdio MCP server for using the gstack workflow across Codex projects.
+Local stdio MCP server for using the JStack workflow across Codex projects.
 
 This is intentionally a narrow orchestration layer, not a generic shell runner.
-It exposes safe, project-oriented tools that help an agent apply gstack patterns
+It exposes safe, project-oriented tools that help an agent apply JStack patterns
 consistently:
 
-- `gstack_detect_project`
-- `gstack_list_skills`
-- `gstack_read_skill`
-- `gstack_plan`
-- `gstack_team_plan`
-- `gstack_dispatch_check`
-- `gstack_policy_check`
-- `gstack_preflight`
-- `gstack_health`
-- `gstack_review`
-- `gstack_security_audit`
-- `gstack_qa`
-- `gstack_context_save`
-- `gstack_context_restore`
-- `gstack_ship_check`
-- `gstack_release_readiness`
-- `gstack_quant_backtest_review`
+- `jstack_detect_project`
+- `jstack_list_skills`
+- `jstack_read_skill`
+- `jstack_plan`
+- `jstack_team_plan`
+- `jstack_dispatch_check`
+- `jstack_policy_check`
+- `jstack_preflight`
+- `jstack_health`
+- `jstack_review`
+- `jstack_security_audit`
+- `jstack_qa`
+- `jstack_context_save`
+- `jstack_context_restore`
+- `jstack_ship_check`
+- `jstack_release_readiness`
+- `jstack_quant_backtest_review`
 
 ## Design Rules
 
@@ -32,37 +32,39 @@ consistently:
 - Test/build execution is optional and restricted to commands discovered from
   project files such as `package.json`, `pyproject.toml`, `Cargo.toml`, or
   `go.mod`.
-- Context save writes only to `~/.gstack/mcp-context`.
-- gstack skills are read from `~/.gstack/repos/gstack`.
+- Context save writes only to `~/.jstack/mcp-context`.
+- Upstream gstack skills are read from `~/.gstack/repos/gstack`.
 
 ## Enterprise Enforcement
 
 The server supports policy-as-code through a project policy file. Recommended
 file names:
 
-- `gstack.enterprise.json`
-- `gstack.policy.json`
-- `gstack.yml`
-- `.gstack/gstack.enterprise.json`
-- `.gstack/gstack.yml`
+- `jstack.enterprise.json`
+- `jstack.policy.json`
+- `jstack.yml`
+- `.jstack/jstack.enterprise.json`
+- `.jstack/jstack.yml`
+
+Legacy `gstack.*` policy files are also accepted for migration compatibility.
 
 Templates live in `templates/`:
 
-- `gstack.enterprise.json`
-- `gstack.enterprise.yml`
+- `jstack.enterprise.json`
+- `jstack.enterprise.yml`
 - `pull_request_template.md`
 - `release_checklist.md`
 - `quant_backtest_review.md`
 
-Use `gstack_policy_check` to load project policy and detect protected file
-changes. Use `gstack_preflight` before substantial edits or handoff. Use
-`gstack_release_readiness` before any production release. Use
-`gstack_quant_backtest_review` before making trading, EA, or backtest
+Use `jstack_policy_check` to load project policy and detect protected file
+changes. Use `jstack_preflight` before substantial edits or handoff. Use
+`jstack_release_readiness` before any production release. Use
+`jstack_quant_backtest_review` before making trading, EA, or backtest
 performance claims.
 
 ## Virtual Engineering Team
 
-`gstack_team_plan` turns `/gstack-dev` into a controlled virtual engineering
+`jstack_team_plan` turns `/j-stack-dev` into a controlled virtual engineering
 team. It always keeps a Lead Engineer accountable and conditionally adds
 specialists:
 
@@ -77,7 +79,7 @@ specialists:
 - Quant / Backtest Reviewer
 - Documentation / Handoff Writer
 
-Use `gstack_dispatch_check` before spawning several specialists or assigning
+Use `jstack_dispatch_check` before spawning several specialists or assigning
 file edits. The default maximum is three specialists. More specialists require a
 lead justification. Subagents are read-only by default, and only one agent may
 own a given file/module write scope.
@@ -85,20 +87,20 @@ own a given file/module write scope.
 ## Local Smoke Test
 
 ```bash
-python3 /Users/jarodfroneman/.codex/mcp/gstack/smoke_test.py
+python3 /Users/jarodfroneman/.codex/mcp/jstack/smoke_test.py
 ```
 
 ## Install Into Codex
 
 ```bash
-python3 /Users/jarodfroneman/.codex/mcp/gstack/install.py
+python3 /Users/jarodfroneman/.codex/mcp/jstack/install.py
 ```
 
 The installer:
 
-- copies this folder to `~/.codex/mcp/gstack`
+- copies this folder to `~/.codex/mcp/jstack`
 - backs up `~/.codex/config.toml`
-- adds `[mcp_servers.gstack]`
+- adds `[mcp_servers.jstack]`
 
 Restart Codex or open a new thread after installation.
 
@@ -126,7 +128,7 @@ Use this MCP as an enterprise project quality gate:
      `browse`, `benchmark`
    - Release: `ship`, `land-and-deploy`, `canary` only when explicitly requested
    - Handoff: `context-save`, `document-release`, `learn`
-3. Return required gates and release blockers from `gstack_plan`.
+3. Return required gates and release blockers from `jstack_plan`.
 4. Build a lead-plus-specialists team plan when task risk justifies it.
 5. Run policy and preflight checks before substantial implementation.
 6. Run safe health/review/security/QA checks.

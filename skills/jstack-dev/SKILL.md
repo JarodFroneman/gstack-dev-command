@@ -1,36 +1,36 @@
----
-name: gstack-dev
-description: Enterprise gstack development and mastery workflow for Codex projects. Use when the user invokes /gstack-dev or asks to apply the standard gstack project workflow for planning, implementation, code quality, security, frontend/product QA, release checks, context handoff, or deliberate engineering skill development. Prefer the gstack MCP tools when available; otherwise use installed gstack skills and normal Codex tools.
+﻿---
+name: jstack-dev
+description: Enterprise JStack development and mastery workflow for Codex projects. Use when the user invokes /j-stack-dev, /jstack-subagents, /jstack-full-team, or asks to apply the standard JStack project workflow for planning, implementation, code quality, security, frontend/product QA, release checks, context handoff, or deliberate engineering skill development. Prefer the jstack MCP tools when available; otherwise use installed upstream gstack skills and normal Codex tools.
 metadata:
-  short-description: Run the enterprise gstack project workflow and mastery loop
+  short-description: Run the enterprise jstack project workflow and mastery loop
 ---
 
-# gstack-dev
+# jstack-dev
 
-Use this skill as the enterprise project-development entrypoint for gstack.
+Use this skill as the enterprise project-development entrypoint for JStack.
 Operate as a senior engineering and DevOps authority: production-minded,
 evidence-driven, and intolerant of vague implementation claims. This workflow is
 both an execution standard and a mastery-training system for Jay.
 
-## Preferred Path: gstack MCP
+## Preferred Path: jstack MCP
 
-If the `gstack` MCP tools are available in the active thread, use them in this order:
+If the `jstack` MCP tools are available in the active thread, use them in this order:
 
-1. `gstack_detect_project` for the current project path.
-2. `gstack_policy_check` to load project policy, classify risk, and detect
+1. `jstack_detect_project` for the current project path.
+2. `jstack_policy_check` to load project policy, classify risk, and detect
    protected-path changes.
-3. `gstack_plan` with the user's goal, `quality_level="enterprise"`, and
+3. `jstack_plan` with the user's goal, `quality_level="enterprise"`, and
    `mastery_mode=true`.
-4. `gstack_team_plan` for broad, risky, production-facing, security-sensitive,
+4. `jstack_team_plan` for broad, risky, production-facing, security-sensitive,
    UI-sensitive, or quant/data-sensitive work.
-5. `gstack_preflight` before substantial edits or handoff.
-6. `gstack_health` before substantial edits.
-7. `gstack_review` after edits or before handoff.
-8. `gstack_security_audit` for security/compliance/auth/integration-sensitive work.
-9. `gstack_qa` to discover and optionally run safe detected test commands.
-10. `gstack_quant_backtest_review` for trading, EA, or backtest work.
-11. `gstack_release_readiness` and `gstack_ship_check` before release/deploy work.
-12. `gstack_context_save` when the work should be resumable later.
+5. `jstack_preflight` before substantial edits or handoff.
+6. `jstack_health` before substantial edits.
+7. `jstack_review` after edits or before handoff.
+8. `jstack_security_audit` for security/compliance/auth/integration-sensitive work.
+9. `jstack_qa` to discover and optionally run safe detected test commands.
+10. `jstack_quant_backtest_review` for trading, EA, or backtest work.
+11. `jstack_release_readiness` and `jstack_ship_check` before release/deploy work.
+12. `jstack_context_save` when the work should be resumable later.
 
 Do not use the MCP as a substitute for user approval, project-specific deploy rules, or destructive-command safeguards.
 
@@ -41,7 +41,7 @@ substantial development work, apply these gates.
 
 ## Virtual Engineering Team Model
 
-`/gstack-dev` should behave like a small engineering department, not an
+`/j-stack-dev` should behave like a small engineering department, not an
 uncontrolled agent swarm. One Lead Engineer owns the task, and specialists are
 dispatched only when their review materially reduces risk or increases speed.
 
@@ -112,7 +112,7 @@ dispatched only when their review materially reduces risk or increases speed.
 - No broad refactors, metadata churn, production mutation, or deploy/restart side effects outside the requested scope.
 - Every non-trivial claim needs evidence: tests, logs, source references, browser checks, API responses, screenshots, or explicit residual risk.
 - If required quality/security/QA/release gates are missing, say so directly and do not call the work production-ready.
-- For projects with a `gstack.enterprise.json`, `gstack.policy.json`, `gstack.yml`, or `.gstack/gstack.yml` policy file, treat that file as the project-specific enforcement layer.
+- For projects with a `jstack.enterprise.json`, `jstack.policy.json`, `jstack.yml`, `.jstack/jstack.yml`, or legacy `gstack.*` policy file, treat that file as the project-specific enforcement layer.
 - For trading/EA/quant work, do not make performance or investor-facing claims without reproducible data source, history quality, cost model, settings file, source version, sample split, and bias-control evidence.
 
 ### 1. Classify the work
@@ -133,7 +133,7 @@ Use the stricter gate when a task matches more than one class.
 
 - Read project instructions first: `AGENTS.md`, `CLAUDE.md`, README, relevant
   docs, and local config.
-- Use `context-restore` or `gstack_context_restore` when resuming prior work.
+- Use `context-restore` or `jstack_context_restore` when resuming prior work.
 - For Caberg/server work, read Obsidian memory starting with `Memory/COMPACT.md`,
   then the relevant project memory note.
 - Detect stack, test commands, and project boundaries before editing.
@@ -152,7 +152,7 @@ Use the stricter gate when a task matches more than one class.
 
 - Risky repo or narrow edit boundary: `guard` or `freeze`.
 - Destructive-command awareness: `careful`.
-- Enterprise policy: `gstack_policy_check` and `gstack_preflight`.
+- Enterprise policy: `jstack_policy_check` and `jstack_preflight`.
 - Never deploy, push, merge, delete data, reset git state, restart production,
   alter DNS/SSL, or modify production systems unless explicitly requested and
   allowed by project rules.
@@ -190,7 +190,7 @@ Use the stricter gate when a task matches more than one class.
 ### 9. Release gate
 
 - Use `ship` only when explicitly asked to ship or open a PR.
-- Use `gstack_release_readiness` and `ship_check`/`gstack_ship_check` before release handoff.
+- Use `jstack_release_readiness` and `ship_check`/`jstack_ship_check` before release handoff.
 - Use `land-and-deploy` and `canary` only when explicitly asked to merge,
   deploy, or monitor production.
 - Do not call work production-ready if required tests, security, QA, or docs are
@@ -199,7 +199,7 @@ Use the stricter gate when a task matches more than one class.
 ### 10. Handoff gate
 
 - Summarize files changed, checks run, results, risks, and open items.
-- Use `context-save` or `gstack_context_save` for non-trivial work.
+- Use `context-save` or `jstack_context_save` for non-trivial work.
 - Use `document-release` when behavior, API, deployment, or user workflow docs
   changed.
 - Update Obsidian memory for durable Caberg/server facts.
@@ -237,14 +237,14 @@ Progressive stages:
 - Security/safety: `cso`, `careful`, `guard`, `freeze`, `unfreeze`
 - Frontend/product: `design-review`, `design-consultation`, `qa`, `qa-only`,
   `browse`, `benchmark`
-- Testing/release: `qa`, `qa-only`, `ship`, `gstack_ship_check`, `canary`,
+- Testing/release: `qa`, `qa-only`, `ship`, `jstack_ship_check`, `canary`,
   `land-and-deploy`
 - Continuity/docs: `context-save`, `context-restore`, `document-generate`,
   `document-release`, `learn`
 
 ## Fallback Path When MCP Is Not Loaded
 
-If the gstack MCP tools are not visible:
+If the jstack MCP tools are not visible:
 
 1. Read project instructions first: `AGENTS.md`, `CLAUDE.md`, README, or relevant docs.
 2. Use normal Codex tools to inspect the repo and detect stack/test commands.

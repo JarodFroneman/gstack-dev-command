@@ -1,4 +1,4 @@
-# gstack Release Checklist
+﻿# JStack Release Checklist
 
 ## Approval
 

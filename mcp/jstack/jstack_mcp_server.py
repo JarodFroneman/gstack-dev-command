@@ -21,8 +21,8 @@ from pathlib import Path
 from typing import Any, Callable
 
 
-SERVER_NAME = "gstack-mcp"
-SERVER_VERSION = "0.5.0"
+SERVER_NAME = "jstack-mcp"
+SERVER_VERSION = "0.6.0"
 PROTOCOL_VERSION = "2024-11-05"
 MAX_OUTPUT_CHARS = 12_000
 
@@ -159,7 +159,7 @@ def read_json(path: Path) -> dict[str, Any] | None:
 
 
 DEFAULT_ENTERPRISE_POLICY: dict[str, Any] = {
-    "schemaVersion": "gstack.enterprise.v1",
+    "schemaVersion": "jstack.enterprise.v1",
     "standard": "enterprise",
     "requiredChecks": [
         "project_instructions_read",
@@ -311,6 +311,15 @@ def deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]
 
 def policy_candidates(project_path: Path) -> list[Path]:
     return [
+        project_path / "jstack.enterprise.json",
+        project_path / "jstack.policy.json",
+        project_path / "jstack.json",
+        project_path / "jstack.yml",
+        project_path / "jstack.yaml",
+        project_path / ".jstack" / "jstack.enterprise.json",
+        project_path / ".jstack" / "jstack.policy.json",
+        project_path / ".jstack" / "jstack.yml",
+        project_path / ".jstack" / "jstack.yaml",
         project_path / "gstack.enterprise.json",
         project_path / "gstack.policy.json",
         project_path / "gstack.json",
@@ -329,7 +338,7 @@ def load_enterprise_policy(project_path: Path) -> dict[str, Any]:
             continue
         parsed = read_policy_file(path)
         if parsed is None:
-            raise ToolError(f"Could not parse gstack policy file: {path}")
+            raise ToolError(f"Could not parse JStack policy file: {path}")
         policy = deep_merge(DEFAULT_ENTERPRISE_POLICY, parsed)
         policy["_sourcePath"] = str(path)
         policy["_usingDefault"] = False
@@ -1186,6 +1195,11 @@ def tool_detect_project(args: dict[str, Any]) -> dict[str, Any]:
     g_root = find_gstack_root()
     bin_dir = gstack_bin()
     project_config_paths = [
+        project_path / ".jstack" / "project.yaml",
+        project_path / ".jstack" / "project.yml",
+        project_path / ".jstack" / "project.json",
+        project_path / "jstack.yaml",
+        project_path / "jstack.yml",
         project_path / ".gstack" / "project.yaml",
         project_path / ".gstack" / "project.yml",
         project_path / ".gstack" / "project.json",
@@ -1196,6 +1210,9 @@ def tool_detect_project(args: dict[str, Any]) -> dict[str, Any]:
     return {
         "projectPath": str(project_path),
         "gitRoot": git_root(project_path),
+        "jstackRoot": str(g_root) if g_root else None,
+        "jstackBin": str(bin_dir) if bin_dir else None,
+        "jstackInstalled": bool(g_root),
         "gstackRoot": str(g_root) if g_root else None,
         "gstackBin": str(bin_dir) if bin_dir else None,
         "gstackInstalled": bool(g_root),
@@ -1233,7 +1250,7 @@ def tool_read_skill(args: dict[str, Any]) -> dict[str, Any]:
                 "skill": parsed,
                 "content": truncate(text, int(args.get("max_chars") or 20_000)),
             }
-    raise ToolError(f"Unknown gstack skill: {skill_name}. Use gstack_list_skills first.")
+    raise ToolError(f"Unknown upstream gstack skill: {skill_name}. Use jstack_list_skills first.")
 
 
 def tool_plan(args: dict[str, Any]) -> dict[str, Any]:
@@ -1252,13 +1269,13 @@ def tool_plan(args: dict[str, Any]) -> dict[str, Any]:
     steps = [
         {
             "gate": "Classify",
-            "skill": "gstack_plan",
+            "skill": "jstack_plan",
             "purpose": "Classify the work by risk and select the strictest matching workflow.",
             "doneWhen": "The plan names the applicable risk classes and required gates.",
         },
         {
             "gate": "Context",
-            "skill": "gstack_detect_project -> context-restore",
+            "skill": "jstack_detect_project -> context-restore",
             "purpose": "Read project instructions, restore prior context, detect repo boundaries, and load project memory where relevant.",
             "doneWhen": "Project path, repo instructions, stack, test commands, and relevant memory/docs are known.",
         },
@@ -1282,13 +1299,13 @@ def tool_plan(args: dict[str, Any]) -> dict[str, Any]:
         },
         {
             "gate": "Quality",
-            "skill": "gstack_health -> gstack_review -> investigate -> gstack_qa",
+            "skill": "jstack_health -> jstack_review -> investigate -> jstack_qa",
             "purpose": "Check repo health, review diffs, run focused verification, and investigate root causes for defects.",
             "doneWhen": "Relevant lint/typecheck/test/build checks pass or failures are clearly reported.",
         },
         {
             "gate": "Security/compliance",
-            "skill": "gstack_security_audit -> cso",
+            "skill": "jstack_security_audit -> cso",
             "purpose": "Review auth, secrets, RBAC, PII, payment, public endpoints, webhooks, infra, and external integration boundaries.",
             "doneWhen": "Sensitive-surface risks are reviewed and release blockers are resolved or documented.",
         },
@@ -1300,13 +1317,13 @@ def tool_plan(args: dict[str, Any]) -> dict[str, Any]:
         },
         {
             "gate": "Release",
-            "skill": "gstack_ship_check -> ship -> land-and-deploy -> canary",
+            "skill": "jstack_ship_check -> ship -> land-and-deploy -> canary",
             "purpose": "Prepare, release, deploy, and monitor only when the user explicitly asks for release/deploy work.",
             "doneWhen": "Release work has explicit approval and ship/deploy/canary checks are complete.",
         },
         {
             "gate": "Handoff",
-            "skill": "gstack_context_save -> document-release -> learn",
+            "skill": "jstack_context_save -> document-release -> learn",
             "purpose": "Save decisions, files changed, checks run, risks, open items, and durable memory.",
             "doneWhen": "The handoff states what changed, what was checked, remaining risk, and next steps.",
         },
@@ -1561,7 +1578,7 @@ def tool_qa(args: dict[str, Any]) -> dict[str, Any]:
     result: dict[str, Any] | None = None
     if run:
         if not command_key:
-            raise ToolError("When run=true, command_key is required. Use gstack_qa with run=false to list allowed keys.")
+            raise ToolError("When run=true, command_key is required. Use jstack_qa with run=false to list allowed keys.")
         selected = next((command for command in commands if command["key"] == command_key), None)
         if not selected:
             raise ToolError(f"Unsupported command_key: {command_key}. Allowed: {[command['key'] for command in commands]}")
@@ -1576,7 +1593,7 @@ def tool_qa(args: dict[str, Any]) -> dict[str, Any]:
 
 
 def context_dir(project_path: Path) -> Path:
-    return Path.home() / ".gstack" / "mcp-context" / project_slug(project_path)
+    return Path.home() / ".jstack" / "mcp-context" / project_slug(project_path)
 
 
 def tool_context_save(args: dict[str, Any]) -> dict[str, Any]:
@@ -1608,7 +1625,7 @@ def tool_context_restore(args: dict[str, Any]) -> dict[str, Any]:
     project_path = require_project_path(args.get("project_path"))
     latest_path = context_dir(project_path) / "latest.json"
     if not latest_path.exists():
-        raise ToolError(f"No saved gstack MCP context for {project_path}")
+        raise ToolError(f"No saved JStack MCP context for {project_path}")
     data = read_json(latest_path)
     if data is None:
         raise ToolError(f"Saved context is not valid JSON: {latest_path}")
@@ -1662,8 +1679,8 @@ def tool_policy_check(args: dict[str, Any]) -> dict[str, Any]:
     required_actions: list[str] = []
 
     if policy.get("_usingDefault"):
-        warnings.append("No project gstack policy file found; using default enterprise policy.")
-        required_actions.append("Add a project policy file such as gstack.enterprise.json or gstack.yml before treating the repo as production-governed.")
+        warnings.append("No project JStack policy file found; using default enterprise policy.")
+        required_actions.append("Add a project policy file such as jstack.enterprise.json or jstack.yml before treating the repo as production-governed.")
     if protected_matches:
         blockers.append("Protected paths changed without an explicit project-specific approval record.")
     if target_environment in {"production", "prod"} and not explicit_release_requested:
@@ -1671,7 +1688,7 @@ def tool_policy_check(args: dict[str, Any]) -> dict[str, Any]:
     if "production-release-deploy" in classification_ids and not explicit_release_requested:
         blockers.append("Release/deploy-classified work requires explicit release approval.")
     if goal and goal_is_sensitive(goal, policy):
-        required_actions.append("Run gstack_security_audit and perform a human security/compliance review before release.")
+        required_actions.append("Run jstack_security_audit and perform a human security/compliance review before release.")
     if "data-financial-integration-sensitive" in classification_ids:
         required_actions.append("Document data source, contract assumptions, failure modes, and reconciliation/rollback path.")
     if "ui-product-sensitive" in classification_ids:
@@ -1707,7 +1724,7 @@ def tool_preflight(args: dict[str, Any]) -> dict[str, Any]:
     warnings = list(policy_check["warnings"])
 
     if strict and policy_check["usingDefaultPolicy"]:
-        blockers.append("Strict preflight requires a project gstack policy file.")
+        blockers.append("Strict preflight requires a project JStack policy file.")
     if review["diffCheck"]["returncode"] != 0:
         blockers.append("git diff --check reported whitespace, conflict-marker, or patch hygiene issues.")
     if not health["testCommands"]:
@@ -2066,7 +2083,7 @@ TOOLS: dict[str, dict[str, Any]] = {
         "readOnlyHint": False,
     },
     "gstack_context_save": {
-        "description": "Save a concise project handoff context under ~/.gstack/mcp-context for future restoration.",
+        "description": "Save a concise project handoff context under ~/.jstack/mcp-context for future restoration.",
         "inputSchema": {
             "type": "object",
             "required": ["summary"],
@@ -2131,6 +2148,15 @@ TOOLS: dict[str, dict[str, Any]] = {
         "readOnlyHint": True,
     },
 }
+
+
+for _name, _meta in list(TOOLS.items()):
+    if _name.startswith("gstack_"):
+        _alias = "jstack_" + _name[len("gstack_") :]
+        if _alias not in TOOLS:
+            _alias_meta = dict(_meta)
+            _alias_meta["description"] = str(_alias_meta["description"]).replace("gstack", "jstack").replace("Gstack", "JStack")
+            TOOLS[_alias] = _alias_meta
 
 
 def tool_definitions() -> list[dict[str, Any]]:

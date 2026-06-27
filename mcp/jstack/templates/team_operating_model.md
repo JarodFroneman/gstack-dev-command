@@ -1,8 +1,8 @@
-# gstack Virtual Engineering Team
+﻿# JStack Virtual Engineering Team
 
 ## Principle
 
-`/gstack-dev` is a lead-agent workflow. The Lead Engineer owns scope,
+`/j-stack-dev` is a lead-agent workflow. The Lead Engineer owns scope,
 dispatch, implementation decisions, verification, and handoff. Specialists
 reduce risk; they do not replace accountability.
 

@@ -1,5 +1,5 @@
-{
-  "schemaVersion": "gstack.enterprise.v1",
+﻿{
+  "schemaVersion": "jstack.enterprise.v1",
   "standard": "enterprise",
   "project": {
     "name": "replace-me",

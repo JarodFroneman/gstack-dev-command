@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Install the local gstack MCP server into Codex config.toml."""
+﻿#!/usr/bin/env python3
+"""Install the local jstack MCP server into Codex config.toml."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 SOURCE_DIR = Path(__file__).resolve().parent
 CODEX_HOME = Path.home() / ".codex"
-INSTALL_DIR = CODEX_HOME / "mcp" / "gstack"
+INSTALL_DIR = CODEX_HOME / "mcp" / "jstack"
 CONFIG_PATH = CODEX_HOME / "config.toml"
 
 
@@ -20,10 +20,10 @@ def remove_existing_block(config: str) -> str:
     skip = False
     for line in lines:
         stripped = line.strip()
-        if stripped == "[mcp_servers.gstack]":
+        if stripped in {"[mcp_servers.gstack]", "[mcp_servers.jstack]"}:
             skip = True
             continue
-        if skip and stripped.startswith("[") and stripped != "[mcp_servers.gstack.env]":
+        if skip and stripped.startswith("[") and stripped not in {"[mcp_servers.gstack.env]", "[mcp_servers.jstack.env]"}:
             skip = False
         if skip:
             continue
@@ -40,13 +40,13 @@ def mcp_block() -> str:
     else:
         path = f"{gstack_root / 'bin'}:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     return f"""
-[mcp_servers.gstack]
+[mcp_servers.jstack]
 command = "{command}"
-args = ["{(INSTALL_DIR / "gstack_mcp_server.py").as_posix()}"]
+args = ["{(INSTALL_DIR / "jstack_mcp_server.py").as_posix()}"]
 startup_timeout_sec = 30.0
 tool_timeout_sec = 300.0
 
-[mcp_servers.gstack.env]
+[mcp_servers.jstack.env]
 GSTACK_ROOT = "{gstack_root.as_posix()}"
 PATH = "{path}"
 """.strip()
@@ -60,13 +60,13 @@ def main() -> int:
         shutil.copytree(SOURCE_DIR, INSTALL_DIR, ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
 
     original = CONFIG_PATH.read_text(encoding="utf-8")
-    backup = CONFIG_PATH.with_suffix(".toml.gstack-mcp-backup")
+    backup = CONFIG_PATH.with_suffix(".toml.jstack-mcp-backup")
     backup.write_text(original, encoding="utf-8")
 
     updated = remove_existing_block(original)
     updated = updated.rstrip() + "\n\n" + mcp_block() + "\n"
     CONFIG_PATH.write_text(updated, encoding="utf-8")
-    print(f"Installed gstack MCP server to {INSTALL_DIR}")
+    print(f"Installed jstack MCP server to {INSTALL_DIR}")
     print(f"Updated Codex config: {CONFIG_PATH}")
     print(f"Backup written: {backup}")
     print("Restart Codex or start a new thread for the MCP tools to appear.")

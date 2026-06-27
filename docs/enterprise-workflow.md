@@ -1,4 +1,12 @@
-# Enterprise gstack Workflow
+# Enterprise JStack Workflow
+
+## Commands
+
+1. `/j-stack-dev`: single Lead Engineer, no subagents by default.
+2. `/jstack-subagents`: Lead Engineer plus the right specialist team, normally
+   2-3 specialists.
+3. `/jstack-full-team`: full 11-role JStack team for major or explicitly
+   requested full-team work.
 
 ## Gates
 

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Smoke test for the local gstack MCP stdio server."""
+﻿#!/usr/bin/env python3
+"""Smoke test for the local jstack MCP stdio server."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent
-SERVER = ROOT / "gstack_mcp_server.py"
+SERVER = ROOT / "jstack_mcp_server.py"
 
 
 def encode(message: dict) -> bytes:
@@ -51,14 +51,14 @@ def main() -> int:
             "jsonrpc": "2.0",
             "id": 3,
             "method": "tools/call",
-            "params": {"name": "gstack_detect_project", "arguments": {"project_path": str(ROOT.parent)}},
+            "params": {"name": "jstack_detect_project", "arguments": {"project_path": str(ROOT.parent)}},
         },
         {
             "jsonrpc": "2.0",
             "id": 4,
             "method": "tools/call",
             "params": {
-                "name": "gstack_plan",
+                "name": "jstack_plan",
                 "arguments": {
                     "project_path": str(ROOT.parent),
                     "goal": "Implement an auth-sensitive production feature and prepare release checks",
@@ -72,7 +72,7 @@ def main() -> int:
             "id": 5,
             "method": "tools/call",
             "params": {
-                "name": "gstack_team_plan",
+                "name": "jstack_team_plan",
                 "arguments": {
                     "goal": "Build a production auth feature with tests and release checks",
                     "quality_level": "enterprise",
@@ -84,7 +84,7 @@ def main() -> int:
             "id": 6,
             "method": "tools/call",
             "params": {
-                "name": "gstack_dispatch_check",
+                "name": "jstack_dispatch_check",
                 "arguments": {
                     "goal": "Build a production auth feature with tests and release checks",
                     "explicit_release_requested": True,
@@ -103,7 +103,7 @@ def main() -> int:
             "id": 7,
             "method": "tools/call",
             "params": {
-                "name": "gstack_policy_check",
+                "name": "jstack_policy_check",
                 "arguments": {
                     "project_path": str(ROOT.parent),
                     "goal": "Prepare an auth-sensitive production feature",
@@ -116,7 +116,7 @@ def main() -> int:
             "id": 8,
             "method": "tools/call",
             "params": {
-                "name": "gstack_preflight",
+                "name": "jstack_preflight",
                 "arguments": {
                     "project_path": str(ROOT.parent),
                     "goal": "Prepare a production release",
@@ -130,7 +130,7 @@ def main() -> int:
             "id": 9,
             "method": "tools/call",
             "params": {
-                "name": "gstack_quant_backtest_review",
+                "name": "jstack_quant_backtest_review",
                 "arguments": {
                     "project_path": str(ROOT.parent),
                     "strict": False,
@@ -158,7 +158,7 @@ def main() -> int:
             "id": 10,
             "method": "tools/call",
             "params": {
-                "name": "gstack_release_readiness",
+                "name": "jstack_release_readiness",
                 "arguments": {
                     "project_path": str(ROOT.parent),
                     "goal": "Production release check",
@@ -181,17 +181,17 @@ def main() -> int:
             raise RuntimeError(response["error"])
         if message["id"] == 2:
             tool_names = [tool["name"] for tool in response["result"]["tools"]]
-            assert "gstack_plan" in tool_names
-            assert "gstack_team_plan" in tool_names
-            assert "gstack_dispatch_check" in tool_names
-            assert "gstack_policy_check" in tool_names
-            assert "gstack_preflight" in tool_names
-            assert "gstack_security_audit" in tool_names
-            assert "gstack_release_readiness" in tool_names
-            assert "gstack_quant_backtest_review" in tool_names
+            assert "jstack_plan" in tool_names
+            assert "jstack_team_plan" in tool_names
+            assert "jstack_dispatch_check" in tool_names
+            assert "jstack_policy_check" in tool_names
+            assert "jstack_preflight" in tool_names
+            assert "jstack_security_audit" in tool_names
+            assert "jstack_release_readiness" in tool_names
+            assert "jstack_quant_backtest_review" in tool_names
         if message["id"] == 3:
             structured = response["result"]["structuredContent"]
-            assert "gstackInstalled" in structured
+            assert "jstackInstalled" in structured
         if message["id"] == 4:
             structured = response["result"]["structuredContent"]
             assert structured["qualityLevel"] == "enterprise"
@@ -237,7 +237,7 @@ def main() -> int:
     proc.stdin.close()
     proc.terminate()
     proc.wait(timeout=5)
-    print("gstack MCP smoke test passed")
+    print("jstack MCP smoke test passed")
     return 0
 
 
