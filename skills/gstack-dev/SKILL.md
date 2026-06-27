@@ -72,6 +72,8 @@ dispatched only when their review materially reduces risk or increases speed.
 
 - Small one-file task: Lead Engineer only.
 - Normal bug or feature: Lead plus Investigator and Reviewer.
+- Phase, milestone, project, or broad roadmap work: Lead plus at least Code
+  Investigator and Reviewer when multi-agent tools are available.
 - Broad implementation: add Builder with a disjoint write scope.
 - Architecture/API/database/integration: add Architect.
 - UI/product work: add Product / UX Reviewer and QA Engineer.
@@ -81,6 +83,15 @@ dispatched only when their review materially reduces risk or increases speed.
 - Trading/EA/quant/backtest: add Quant / Backtest Reviewer.
 - Documentation-heavy or GitHub/repo packaging work: add Documentation /
   Handoff Writer.
+- For phase/milestone/project work, architecture-sensitive work,
+  security/compliance-sensitive work, production/release work, UI/product work,
+  quant/data/financial work, or difficult debugging, the Lead MUST spawn the
+  selected specialists when multi-agent tools are available before implementation
+  or final handoff.
+- If no specialists are spawned for one of those tasks, the Lead MUST explicitly
+  write: "No subagents deployed:" followed by the concrete reason, such as
+  "multi-agent tools unavailable", "task reclassified as trivial", or "user
+  requested single-agent mode".
 
 ### Anti-swarm controls
 

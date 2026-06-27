@@ -939,6 +939,8 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
         return {
             "mode": "single-agent",
             "reason": "Trivial or standard-quality task; use the Lead Engineer only unless new risk appears.",
+            "dispatchRequired": False,
+            "dispatchRequirement": "No subagent dispatch required for trivial or standard-quality single-agent work.",
             "maxAgents": 1,
             "specialistCount": 0,
             "requiresLeadJustification": False,
@@ -978,6 +980,9 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
     if re.search(r"debug|root cause|failing|broken|crash|regression", goal_l):
         add("investigator")
         add("qa")
+    if re.search(r"\bphase\b|\bmilestone\b|\bproject\b|\broad roadmap\b|\broad work\b", goal_l):
+        add("investigator")
+        add("reviewer")
     if re.search(r"implement|build|code|create|scaffold", goal_l):
         add("builder")
         add("reviewer")
@@ -989,9 +994,12 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
     agents = [roster_agent(agent_id) for agent_id in selected_ids]
     mode = "single-agent" if selected_ids == ["lead"] else "lead-plus-specialists"
     specialist_count = max(0, len(selected_ids) - 1)
+    dispatch_required = should_require_dispatch(goal, classification_ids, specialist_count)
     return {
         "mode": mode,
         "reason": "Team selected from task risk classes and enterprise quality level.",
+        "dispatchRequired": dispatch_required,
+        "dispatchRequirement": dispatch_requirement_text(dispatch_required, goal),
         "maxAgents": 1 + int(TEAM_DISPATCH_POLICY["defaultMaxSpecialists"]),
         "specialistCount": specialist_count,
         "requiresLeadJustification": specialist_count > int(TEAM_DISPATCH_POLICY["defaultMaxSpecialists"]),
@@ -1000,6 +1008,22 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
         "handoffContract": team_handoff_contract(selected_ids),
         "blockedActions": team_blocked_actions(),
     }
+
+
+def should_require_dispatch(goal: str, classification_ids: set[str], specialist_count: int) -> bool:
+    goal_l = goal.lower()
+    complex_goal = bool(re.search(r"\bphase\b|\bmilestone\b|\bsprint\b|\broad\b|\bproject\b|\bmulti[- ]module\b|\bproduction\b|\bdeploy\b|\brelease\b|\bsecurity\b|\bauth\b|\barchitecture\b|\bdebug\b|\broot cause\b|\bquant\b|\bbacktest\b", goal_l))
+    high_risk = bool(classification_ids & {"architecture", "ui_product", "security_compliance", "data_financial", "production_release"})
+    return specialist_count > 0 and (complex_goal or high_risk)
+
+
+def dispatch_requirement_text(required: bool, goal: str) -> str:
+    if required:
+        return (
+            "If multi-agent tools are available, the Lead Engineer must spawn the selected specialists before implementation or final handoff. "
+            "If no specialists are spawned, the Lead must explicitly state why dispatch was skipped."
+        )
+    return "Specialist dispatch is optional; the Lead may stay single-agent if the task remains scoped and low-risk."
 
 
 def team_handoff_contract(agent_ids: list[str]) -> dict[str, Any]:

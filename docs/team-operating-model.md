@@ -24,6 +24,8 @@ reduce risk; they do not replace accountability.
 
 - Trivial or one-file local work: Lead only.
 - Normal bug/feature: Lead + Investigator + Reviewer.
+- Phase, milestone, project, or broad roadmap work: Lead + Investigator +
+  Reviewer when multi-agent tools are available.
 - Broad implementation: add Builder with disjoint write scope.
 - Architecture/API/database/integration: add Architect.
 - UI/product: add Product / UX and QA.
@@ -36,6 +38,11 @@ reduce risk; they do not replace accountability.
 
 - Default maximum: three specialists.
 - More than three specialists requires a lead justification.
+- For phase/milestone/project work, architecture-sensitive work,
+  security/compliance-sensitive work, production/release work, UI/product work,
+  quant/data/financial work, or difficult debugging, the Lead must either spawn
+  specialists or explicitly state `No subagents deployed:` with the concrete
+  reason.
 - Subagents are read-only by default.
 - Only one writer may own a file/module scope.
 - Subagents must not spawn other subagents.

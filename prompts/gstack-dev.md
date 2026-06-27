@@ -132,9 +132,20 @@ Production code standard:
      uncontrolled swarm.
    - Stay single-agent for trivial fixes, one-file edits, read-only questions,
      and low-risk local work.
-   - Dispatch specialists for multi-module, ambiguous, architecture-sensitive,
+   - Dispatch specialists for phase/milestone/project work and for multi-module,
+     ambiguous, architecture-sensitive,
      security/compliance-sensitive, production/release-facing,
      UI/product-sensitive, quant/data/financial, or difficult debugging work.
+   - When multi-agent tools are available and the task is phase/milestone,
+     broad, production-facing, security-sensitive, architecture-sensitive,
+     UI-sensitive, quant/data-sensitive, or difficult debugging work, you MUST
+     spawn at least two specialists before implementation or final handoff:
+     usually Code Investigator and Reviewer. Add QA, Security, Architect,
+     DevOps, Product/UX, Quant, or Builder when the risk class calls for it.
+   - If no specialists are spawned on such a task, you MUST explicitly write:
+     "No subagents deployed:" followed by the concrete reason, such as
+     "multi-agent tools unavailable", "task reclassified as trivial", or
+     "user requested single-agent mode".
    - Default max is three specialists. More requires explicit lead
      justification.
    - Specialists are read-only by default. Only the Lead or a named Builder may
