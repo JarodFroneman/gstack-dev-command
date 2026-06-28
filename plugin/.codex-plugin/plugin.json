@@ -1,0 +1,44 @@
+{
+  "name": "jstack",
+  "version": "0.1.0+codex.20260628061023",
+  "description": "Universal JStack slash commands, workflow skill, and MCP tools for enterprise Codex development.",
+  "author": {
+    "name": "Jarod Froneman",
+    "url": "https://github.com/JarodFroneman"
+  },
+  "homepage": "https://github.com/JarodFroneman/jstack",
+  "repository": "https://github.com/JarodFroneman/jstack",
+  "license": "MIT",
+  "keywords": [
+    "jstack",
+    "codex",
+    "commands",
+    "workflow",
+    "subagents",
+    "enterprise"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "JStack",
+    "shortDescription": "Universal enterprise workflow slash commands for Codex",
+    "longDescription": "JStack adds three global Codex slash commands: single-lead development, right-sized specialist subagents, and full 11-role team mode. It includes a JStack skill and MCP quality-gate tools for planning, review, QA, release readiness, and quant/backtest checks.",
+    "developerName": "Jarod Froneman",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use /j-stack-dev to run the single-lead workflow.",
+      "Use /jstack-subagents for the right specialist team.",
+      "Use /jstack-full-team for the full 11-role team."
+    ],
+    "websiteURL": "https://github.com/JarodFroneman/jstack",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "brandColor": "#1F6FEB",
+    "screenshots": []
+  }
+}

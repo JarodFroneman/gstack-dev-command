@@ -17,6 +17,9 @@ as implementation building blocks where useful.
 
 ## Included
 
+- `plugin/` - installable Codex plugin package for universal slash commands.
+- `plugin/commands/` - global `/j-stack-dev`, `/jstack-subagents`, and
+  `/jstack-full-team` command definitions.
 - `prompts/j-stack-dev.md` - single-lead slash command.
 - `prompts/jstack-subagents.md` - smart specialist-team slash command.
 - `prompts/jstack-full-team.md` - full-team slash command.
@@ -53,6 +56,34 @@ Legacy `gstack_*` tool aliases are retained for compatibility, but new prompts
 and docs should use `jstack_*`.
 
 ## Install
+
+### Universal Codex Plugin
+
+This is the preferred install path. It makes the commands available globally in
+Codex threads and projects through the plugin command registry.
+
+On this machine the plugin is registered from the personal marketplace at:
+
+```text
+C:\Users\TE05\.agents\plugins\marketplace.json
+```
+
+Install or refresh it with:
+
+```powershell
+python C:\Users\TE05\.codex\skills\.system\plugin-creator\scripts\validate_plugin.py C:\Users\TE05\plugins\jstack
+python C:\Users\TE05\.codex\skills\.system\plugin-creator\scripts\update_plugin_cachebuster.py C:\Users\TE05\plugins\jstack
+& C:\Users\TE05\AppData\Roaming\npm\codex.cmd plugin add jstack@personal
+```
+
+After installing, restart Codex or open a new thread so the command registry
+reloads.
+
+### Legacy Direct Install
+
+This path copies prompt files, the skill, and the MCP server directly into
+`~/.codex`. It is kept for compatibility, but the plugin install above is the
+global slash-command route.
 
 From the repo root:
 
