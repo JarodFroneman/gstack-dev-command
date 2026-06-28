@@ -12,7 +12,8 @@ they do not replace accountability.
   subagents in the same prompt.
 - `/jstack-subagents`: Lead Engineer plus the right specialist team, normally
   2-3 specialists.
-- `/jstack-full-team`: Lead Engineer plus the full 11-role roster.
+- `/jstack-full-team`: full 11-role professional coverage, usually dispatched
+  in waves rather than as uncontrolled concurrency.
 
 ## Default Roster
 
@@ -45,8 +46,9 @@ they do not replace accountability.
 ## Hard Limits
 
 - `/jstack-subagents` should normally use two or three specialists.
-- `/jstack-full-team` may use all 11 roles. If concurrency limits apply, dispatch
-  the team in waves.
+- `/jstack-full-team` must account for all 11 roles, but does not need to run
+  every role concurrently.
+- Full team means complete professional coverage, not uncontrolled concurrency.
 - Subagents are read-only by default.
 - Only one writer may own a file/module scope.
 - Subagents must not spawn other subagents.
@@ -64,3 +66,30 @@ Every specialist response must include:
 - residual risk
 
 The Lead must synthesize conflicts and produce the final engineering judgment.
+
+## Coordination Packet
+
+Before deploying several specialists or using `/jstack-full-team`, the Lead
+must define:
+
+- goal
+- risk class
+- execution mode
+- roles used and why
+- roles skipped and why
+- read/write permissions
+- file ownership map
+- evidence contract
+- conflict rule
+- stop conditions
+- verification gate
+- handoff gate
+
+## Full-Team Wave Pattern
+
+1. Discovery wave: Architect, Code Investigator, Product/UX or Quant when
+   relevant.
+2. Build wave: Builder only after the Lead approves the write scope.
+3. Review wave: Reviewer, QA, Security, DevOps, Documentation.
+4. Synthesis wave: Lead reconciles findings, resolves conflicts, verifies, and
+   hands off.

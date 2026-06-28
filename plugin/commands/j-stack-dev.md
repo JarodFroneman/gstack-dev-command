@@ -1,20 +1,32 @@
-# /j-stack-dev
+---
+description: Run JStack enterprise workflow in single-lead mode
+argument-hint: [GOAL]
+---
 
-Run JStack in single-lead mode for the current task.
+Apply the custom JStack enterprise development workflow to this task.
 
-## Arguments
+Goal:
+$ARGUMENTS
 
-- `goal`: the task or project objective to execute.
+Mode: `single-lead`.
 
-## Workflow
+This command is intentionally the non-subagent version. Do not spawn subagents
+unless the user separately and explicitly asks for subagents in the same prompt.
 
-1. Treat this command as the non-subagent version of JStack.
-2. Do not deploy subagents unless the user separately and explicitly asks for subagents in the same prompt.
-3. Use one Lead Engineer to classify risk, read project instructions, plan, implement, verify, and hand off.
-4. Prefer `jstack_detect_project`, `jstack_policy_check`, `jstack_plan`, and `jstack_preflight` when available.
-5. Run focused review, security, QA, release, or quant checks required by the risk class.
+Use one Lead Engineer to run the enterprise gates:
+
+1. Classify risk.
+2. Read project instructions and restore context.
+3. Use `jstack_detect_project`, `jstack_policy_check`, `jstack_plan`, and
+   `jstack_preflight` when available.
+4. Implement the smallest coherent change.
+5. Run focused review, security, QA, release, or quant checks required by the
+   risk class.
 6. Report files changed, checks run, residual risk, and next steps.
 
-## Fallback
+If the task grows beyond a single Lead Engineer, stop and recommend
+`/jstack-subagents` or `/jstack-full-team` rather than silently escalating.
 
-If `jstack_*` MCP tools are unavailable, use the `jstack-dev` skill and normal Codex tools, then state that a Codex restart or new thread may be needed for MCP refresh.
+If the `jstack_*` MCP tools are unavailable, use the installed `jstack-dev`
+skill and normal Codex tools, then state that a Codex restart/new thread may be
+needed for MCP refresh.

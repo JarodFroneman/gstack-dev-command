@@ -31,6 +31,9 @@ as implementation building blocks where useful.
 - `skills/jstack-dev/SKILL.md` - full operating workflow and mastery system.
 - `mcp/jstack/jstack_mcp_server.py` - local stdio MCP server.
 - `mcp/jstack/templates/` - enterprise policy, release, PR, team, and quant templates.
+- `docs/agent-coordination-protocol.md` - rules that prevent multi-agent
+  overlap, duplicate work, and uncontrolled edits.
+- `docs/mastery-system.md` - staged training system from beginner to expert.
 - `examples/jstack.enterprise.json` - starter project policy.
 - `scripts/install.py` - cross-platform installer for Codex.
 - `scripts/install.ps1` - Windows PowerShell wrapper.
@@ -153,4 +156,5 @@ specialists model. Specialists are read-only by default. Any editing specialist
 must have a disjoint write scope. The Lead Engineer owns final synthesis,
 verification, and handoff.
 
+Full team means complete professional coverage, not uncontrolled concurrency.
 This is intentionally not an uncontrolled swarm executor.

@@ -35,7 +35,30 @@ edit docs only when assigned.
 If platform concurrency limits prevent all specialists from running at once,
 dispatch them in waves while preserving the full-team evidence contract.
 
-Use `jstack_team_plan` and `jstack_dispatch_check` when available. If
-multi-agent tools are unavailable, write `No subagents deployed:` and give the
-concrete reason, then continue with the single-lead enterprise workflow while
-manually applying the full-team review rubric.
+Full team means complete professional coverage, not uncontrolled concurrency.
+Before dispatching, create a coordination packet with:
+
+- goal
+- risk class
+- roles used and why
+- read/write permissions
+- file ownership map
+- evidence contract
+- conflict rule
+- stop conditions
+- verification gate
+- handoff gate
+
+Use `jstack_team_plan` with `team_mode="full-team"` and
+`jstack_dispatch_check` with `team_mode="full-team"` and
+`coordination_packet_supplied=true` when available. If multi-agent tools are
+unavailable, write `No subagents deployed:` and give the concrete reason, then
+continue with the single-lead enterprise workflow while manually applying the
+full-team review rubric.
+
+When concurrency would create noise, dispatch the full team in waves:
+
+1. Discovery: Architect, Code Investigator, Product/UX or Quant when relevant.
+2. Build: Builder only after Lead approval of scope.
+3. Review: Reviewer, QA, Security, DevOps, Documentation.
+4. Synthesis: Lead reconciles findings, verifies, and hands off.

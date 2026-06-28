@@ -27,10 +27,24 @@ Use the Lead Engineer plus the right specialist team, normally 2-3 specialists:
 - For trading/EA/quant/backtest work: Quant / Backtest Reviewer + Reviewer +
   QA Engineer.
 
-Before spawning several specialists or assigning any file edits, use
-`jstack_team_plan` and `jstack_dispatch_check` when available. Specialists are
-read-only by default. Only a Builder may edit, and only inside an explicitly
-assigned disjoint write scope.
+Before spawning several specialists or assigning any file edits, create a
+coordination packet:
+
+- goal
+- risk class
+- roles used and why
+- roles skipped and why
+- read/write permissions
+- file ownership map
+- evidence contract
+- stop conditions
+- verification gate
+
+Use `jstack_team_plan` with `team_mode="smart-subagents"` and
+`jstack_dispatch_check` with `team_mode="smart-subagents"` and
+`coordination_packet_supplied=true` when available. Specialists are read-only
+by default. Only a Builder may edit, and only inside an explicitly assigned
+disjoint write scope.
 
 If multi-agent tools are unavailable, write `No subagents deployed:` and give
 the concrete reason, then continue with the single-lead enterprise workflow.

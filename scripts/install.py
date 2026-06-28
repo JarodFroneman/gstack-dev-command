@@ -51,9 +51,9 @@ def mcp_block(install_dir: Path) -> str:
     command = "python" if is_windows else "python3"
     gstack_root = Path.home() / ".gstack" / "repos" / "gstack"
     if is_windows:
-        path = f"{gstack_root / 'bin'};C:/Windows/System32;C:/Windows;C:/Windows/System32/WindowsPowerShell/v1.0"
+        path = f"{(gstack_root / 'bin').as_posix()};C:/Windows/System32;C:/Windows;C:/Windows/System32/WindowsPowerShell/v1.0"
     else:
-        path = f"{gstack_root / 'bin'}:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        path = f"{(gstack_root / 'bin').as_posix()}:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     server = (install_dir / "jstack_mcp_server.py").as_posix()
     return f"""
 [mcp_servers.jstack]

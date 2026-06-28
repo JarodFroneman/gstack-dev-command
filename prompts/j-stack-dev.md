@@ -24,6 +24,9 @@ Use one Lead Engineer to run the enterprise gates:
    risk class.
 6. Report files changed, checks run, residual risk, and next steps.
 
+If the task grows beyond a single Lead Engineer, stop and recommend
+`/jstack-subagents` or `/jstack-full-team` rather than silently escalating.
+
 If the `jstack_*` MCP tools are unavailable, use the installed `jstack-dev`
 skill and normal Codex tools, then state that a Codex restart/new thread may be
 needed for MCP refresh.

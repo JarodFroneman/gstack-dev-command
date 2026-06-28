@@ -22,7 +22,7 @@ from typing import Any, Callable
 
 
 SERVER_NAME = "jstack-mcp"
-SERVER_VERSION = "0.6.0"
+SERVER_VERSION = "0.7.0"
 PROTOCOL_VERSION = "2024-11-05"
 MAX_OUTPUT_CHARS = 12_000
 
@@ -909,6 +909,7 @@ TEAM_DISPATCH_POLICY = {
     "singleAgentDefault": "Use only the Lead Engineer for trivial tasks and most one-file fixes.",
     "dispatchThreshold": "Dispatch specialists when the task is broad, ambiguous, risky, production-facing, security-sensitive, UI-sensitive, or quant/data-sensitive.",
     "defaultMaxSpecialists": 3,
+    "fullTeamRule": "Full team means complete professional coverage, not uncontrolled concurrency. Dispatch in waves when needed.",
     "aboveMaxRule": "Using more than three specialists requires an explicit lead justification tied to risk, complexity, or disjoint work streams.",
     "accountability": "The Lead Engineer remains accountable for final decisions and must synthesize specialist evidence before editing or handoff.",
     "writeControl": "Only one agent should own a file or module write scope at a time. Review, QA, security, product, and quant specialists are report-only unless explicitly assigned a disjoint write scope.",
@@ -918,6 +919,81 @@ TEAM_DISPATCH_POLICY = {
         "Do not allow parallel uncontrolled edits to overlapping files.",
         "Every specialist must return concrete evidence, file references, commands, screenshots, reports, or blockers.",
         "The lead must close the loop with final verification and residual risk.",
+    ],
+}
+
+TEAM_MODES = {
+    "single-lead": {
+        "description": "Lead Engineer only. Use for small, low-risk, one-file, or clearly bounded work.",
+        "concurrency": "none",
+        "defaultWriteRule": "Lead Engineer may edit. No subagents.",
+    },
+    "smart-subagents": {
+        "description": "Lead Engineer plus the right specialist team, normally two or three specialists.",
+        "concurrency": "limited",
+        "defaultWriteRule": "Specialists are read-only by default. Builder edits only assigned disjoint scope.",
+    },
+    "full-team": {
+        "description": "Full 11-role professional coverage. This is not permission for uncontrolled parallel edits.",
+        "concurrency": "wave-based",
+        "defaultWriteRule": "One Builder by default. More writers require explicit disjoint file/module ownership.",
+    },
+}
+
+TEAM_COORDINATION_PROTOCOL = {
+    "coreRule": "Full team means complete professional coverage, not uncontrolled concurrency.",
+    "coordinationPacketRequiredFor": ["smart-subagents", "full-team"],
+    "requiredFields": [
+        "goal",
+        "riskClass",
+        "mode",
+        "rolesUsed",
+        "rolesNotUsed",
+        "readWritePermissions",
+        "fileOwnershipMap",
+        "evidenceContract",
+        "conflictRule",
+        "stopConditions",
+        "verificationGate",
+        "handoffGate",
+    ],
+    "permissionDefaults": {
+        "lead": "orchestrator; may edit",
+        "builder": "may edit only assigned disjoint scope",
+        "docs": "docs only when assigned",
+        "allOtherSpecialists": "read-only",
+    },
+    "fileOwnershipRules": [
+        "No two editing agents may own the same file or module.",
+        "Shared files require Lead Engineer ownership or explicit serialization.",
+        "Specialists may not edit outside assigned write scope.",
+        "A file ownership conflict blocks dispatch until resolved.",
+        "If the scope cannot be split cleanly, use one Builder.",
+    ],
+    "evidenceContract": [
+        "scope handled",
+        "files, commands, screenshots, logs, reports, or data reviewed",
+        "findings ordered by severity or importance",
+        "explicit blockers",
+        "residual risk",
+        "recommended next action",
+    ],
+    "conflictRule": "Evidence beats opinion. Reproduction beats speculation. Project rules beat generic best practice. Safety gates beat speed. Lead Engineer decides and documents unresolved risk.",
+    "stopConditions": [
+        "required user approval is missing",
+        "production deploy/restart/data mutation is implied but not approved",
+        "secrets or credentials are exposed",
+        "agents disagree on a release blocker",
+        "tests fail for an unclear reason",
+        "file ownership overlaps",
+        "the task scope expands beyond the user request",
+        "the strategy or implementation would be misleading without more evidence",
+    ],
+    "fullTeamWavePattern": [
+        "Discovery wave: Architect, Code Investigator, Product/UX or Quant when relevant.",
+        "Build wave: Builder only after Lead approves scope.",
+        "Review wave: Reviewer, QA, Security, DevOps, Documentation.",
+        "Synthesis wave: Lead reconciles evidence, resolves conflicts, verifies, and hands off.",
     ],
 }
 
@@ -935,7 +1011,34 @@ def roster_agent(agent_id: str) -> dict[str, Any]:
     return next(agent for agent in AGENT_ROSTER if agent["id"] == agent_id)
 
 
-def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_level: str = "enterprise") -> dict[str, Any]:
+def normalize_team_mode(team_mode: str | None) -> str:
+    normalized = (team_mode or "auto").strip().lower().replace("_", "-")
+    aliases = {
+        "single": "single-lead",
+        "single-agent": "single-lead",
+        "lead": "single-lead",
+        "lead-only": "single-lead",
+        "smart": "smart-subagents",
+        "subagents": "smart-subagents",
+        "right-team": "smart-subagents",
+        "full": "full-team",
+        "fullteam": "full-team",
+        "11": "full-team",
+        "11-agent": "full-team",
+    }
+    normalized = aliases.get(normalized, normalized)
+    if normalized not in {"auto", "single-lead", "smart-subagents", "full-team"}:
+        raise ToolError("team_mode must be one of auto, single-lead, smart-subagents, or full-team.")
+    return normalized
+
+
+def choose_agent_team(
+    goal: str,
+    classifications: list[dict[str, Any]],
+    quality_level: str = "enterprise",
+    team_mode: str | None = "auto",
+) -> dict[str, Any]:
+    mode_requested = normalize_team_mode(team_mode)
     classification_ids = {item["id"] for item in classifications}
     goal_l = goal.lower()
     selected_ids: list[str] = ["lead"]
@@ -944,9 +1047,30 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
         if agent_id not in selected_ids:
             selected_ids.append(agent_id)
 
-    if "trivial" in classification_ids and quality_level == "standard":
+    if mode_requested == "full-team":
+        selected_ids = [agent["id"] for agent in AGENT_ROSTER]
+        agents = [roster_agent(agent_id) for agent_id in selected_ids]
+        return {
+            "mode": "full-team",
+            "requestedMode": mode_requested,
+            "reason": "Full-team mode was explicitly requested; use all 11 roles as professional coverage, dispatching in waves if needed.",
+            "dispatchRequired": True,
+            "dispatchRequirement": dispatch_requirement_text(True, goal),
+            "maxAgents": len(AGENT_ROSTER),
+            "specialistCount": len(AGENT_ROSTER) - 1,
+            "requiresLeadJustification": False,
+            "leadJustification": "Explicit /jstack-full-team invocation or full-team mode request.",
+            "agents": agents,
+            "dispatchPolicy": TEAM_DISPATCH_POLICY,
+            "coordinationProtocol": agent_coordination_packet(goal, "full-team", selected_ids, classifications),
+            "handoffContract": team_handoff_contract(selected_ids),
+            "blockedActions": team_blocked_actions(),
+        }
+
+    if mode_requested == "single-lead" or ("trivial" in classification_ids and quality_level == "standard"):
         return {
             "mode": "single-agent",
+            "requestedMode": mode_requested,
             "reason": "Trivial or standard-quality task; use the Lead Engineer only unless new risk appears.",
             "dispatchRequired": False,
             "dispatchRequirement": "No subagent dispatch required for trivial or standard-quality single-agent work.",
@@ -955,6 +1079,7 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
             "requiresLeadJustification": False,
             "agents": [roster_agent("lead")],
             "dispatchPolicy": TEAM_DISPATCH_POLICY,
+            "coordinationProtocol": agent_coordination_packet(goal, "single-lead", ["lead"], classifications),
             "handoffContract": team_handoff_contract(["lead"]),
             "blockedActions": team_blocked_actions(),
         }
@@ -1002,10 +1127,13 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
 
     agents = [roster_agent(agent_id) for agent_id in selected_ids]
     mode = "single-agent" if selected_ids == ["lead"] else "lead-plus-specialists"
+    execution_mode = "single-lead" if selected_ids == ["lead"] else "smart-subagents"
     specialist_count = max(0, len(selected_ids) - 1)
     dispatch_required = should_require_dispatch(goal, classification_ids, specialist_count)
     return {
         "mode": mode,
+        "requestedMode": mode_requested,
+        "executionMode": execution_mode,
         "reason": "Team selected from task risk classes and enterprise quality level.",
         "dispatchRequired": dispatch_required,
         "dispatchRequirement": dispatch_requirement_text(dispatch_required, goal),
@@ -1014,9 +1142,81 @@ def choose_agent_team(goal: str, classifications: list[dict[str, Any]], quality_
         "requiresLeadJustification": specialist_count > int(TEAM_DISPATCH_POLICY["defaultMaxSpecialists"]),
         "agents": agents,
         "dispatchPolicy": TEAM_DISPATCH_POLICY,
+        "coordinationProtocol": agent_coordination_packet(goal, execution_mode, selected_ids, classifications),
         "handoffContract": team_handoff_contract(selected_ids),
         "blockedActions": team_blocked_actions(),
     }
+
+
+def agent_coordination_packet(goal: str, mode: str, selected_ids: list[str], classifications: list[dict[str, Any]]) -> dict[str, Any]:
+    selected = set(selected_ids)
+    roles_used = []
+    roles_not_used = []
+    for agent in AGENT_ROSTER:
+        entry = {
+            "id": agent["id"],
+            "name": agent["name"],
+            "defaultPermission": role_permission(agent["id"]),
+            "requiredEvidence": agent["requiredEvidence"],
+        }
+        if agent["id"] in selected:
+            entry["whyNeeded"] = role_selection_reason(agent["id"], classifications, mode)
+            roles_used.append(entry)
+        else:
+            entry["whySkipped"] = "Not required for this mode/risk class unless new evidence raises risk."
+            roles_not_used.append(entry)
+    return {
+        "goal": goal,
+        "riskClass": [item["id"] for item in classifications],
+        "mode": mode,
+        "modeDefinition": TEAM_MODES[mode],
+        "rolesUsed": roles_used,
+        "rolesNotUsed": roles_not_used,
+        "readWritePermissions": TEAM_COORDINATION_PROTOCOL["permissionDefaults"],
+        "fileOwnershipMapRequired": mode != "single-lead",
+        "fileOwnershipRules": TEAM_COORDINATION_PROTOCOL["fileOwnershipRules"],
+        "evidenceContract": TEAM_COORDINATION_PROTOCOL["evidenceContract"],
+        "conflictRule": TEAM_COORDINATION_PROTOCOL["conflictRule"],
+        "stopConditions": TEAM_COORDINATION_PROTOCOL["stopConditions"],
+        "verificationGate": "Define tests, lint/typecheck/build, browser QA, security scan, backtest evidence, logs, or screenshots required for this risk class.",
+        "handoffGate": "Lead must summarize changed files, checks run, specialist findings reconciled, unresolved risks, and next steps.",
+        "wavePattern": TEAM_COORDINATION_PROTOCOL["fullTeamWavePattern"] if mode == "full-team" else [],
+        "antiSlopStandard": ANTI_SLOP_BASE,
+    }
+
+
+def role_permission(agent_id: str) -> str:
+    if agent_id == "lead":
+        return "orchestrator; may edit"
+    if agent_id == "builder":
+        return "may edit only assigned disjoint scope"
+    if agent_id == "docs":
+        return "docs only when assigned"
+    return "read-only"
+
+
+def role_selection_reason(agent_id: str, classifications: list[dict[str, Any]], mode: str) -> str:
+    if agent_id == "lead":
+        return "Required for scope ownership, synthesis, final decision, verification, and handoff."
+    if mode == "full-team":
+        return "Included by explicit full-team mode as professional coverage; may be dispatched in a wave instead of concurrently."
+    classification_agents = {
+        "normal": {"investigator", "builder", "reviewer", "qa"},
+        "architecture": {"architect", "investigator", "reviewer", "docs"},
+        "product": {"product", "docs"},
+        "ui_product": {"product", "qa", "reviewer"},
+        "security_compliance": {"security", "reviewer", "qa"},
+        "data_financial": {"quant", "reviewer", "qa"},
+        "production_release": {"devops", "security", "qa", "reviewer", "docs"},
+    }
+    matching = [
+        item["label"]
+        for item in classifications
+        if agent_id in classification_agents.get(item["id"], set())
+    ]
+    if matching:
+        return "Selected by risk classification: " + ", ".join(matching)
+    return "Selected because the task risk or goal keywords match this specialist's responsibility."
 
 
 def should_require_dispatch(goal: str, classification_ids: set[str], specialist_count: int) -> bool:
@@ -1372,14 +1572,17 @@ def tool_team_plan(args: dict[str, Any]) -> dict[str, Any]:
     quality_level = str(args.get("quality_level") or "enterprise").strip().lower()
     if quality_level not in {"standard", "enterprise"}:
         raise ToolError("quality_level must be 'standard' or 'enterprise'.")
+    team_mode = normalize_team_mode(args.get("team_mode"))
     classifications = classify_work(goal)
     return {
         "goal": goal,
         "qualityLevel": quality_level,
+        "teamMode": team_mode,
         "classifications": classifications,
-        "team": choose_agent_team(goal, classifications, quality_level=quality_level),
+        "team": choose_agent_team(goal, classifications, quality_level=quality_level, team_mode=team_mode),
         "availableRoster": AGENT_ROSTER,
         "policy": TEAM_DISPATCH_POLICY,
+        "coordinationProtocol": TEAM_COORDINATION_PROTOCOL,
     }
 
 
@@ -1404,6 +1607,7 @@ def normalize_agent_plan(agent: Any) -> dict[str, Any]:
 
 def tool_dispatch_check(args: dict[str, Any]) -> dict[str, Any]:
     goal = str(args.get("goal") or "").strip()
+    team_mode = normalize_team_mode(args.get("team_mode"))
     proposed = args.get("team") or args.get("agents") or {}
     if isinstance(proposed, dict):
         raw_agents = proposed.get("agents") or []
@@ -1416,6 +1620,7 @@ def tool_dispatch_check(args: dict[str, Any]) -> dict[str, Any]:
     max_specialists = int(args.get("max_specialists") or TEAM_DISPATCH_POLICY["defaultMaxSpecialists"])
     explicit_justification = str(args.get("lead_justification") or "").strip()
     explicit_release_requested = bool(args.get("explicit_release_requested") or False)
+    coordination_packet_supplied = bool(args.get("coordination_packet_supplied") or False)
     classifications = classify_work(goal) if goal else []
     classification_ids = {item["id"] for item in classifications}
     blockers: list[str] = []
@@ -1430,6 +1635,17 @@ def tool_dispatch_check(args: dict[str, Any]) -> dict[str, Any]:
     specialist_count = len([agent for agent in agents if agent["id"] != "lead"])
     if specialist_count > max_specialists and not explicit_justification:
         blockers.append(f"Agent plan has {specialist_count} specialists; default maximum is {max_specialists} without lead justification.")
+    if team_mode == "full-team":
+        expected_ids = {agent["id"] for agent in AGENT_ROSTER}
+        missing = sorted(expected_ids - set(ids))
+        if missing:
+            blockers.append("Full-team mode must account for all 11 roles. Missing ids: " + ", ".join(missing))
+        if not coordination_packet_supplied:
+            blockers.append("Full-team mode requires a coordination packet before dispatch.")
+    if team_mode == "smart-subagents" and specialist_count > max_specialists and not explicit_justification:
+        blockers.append("Smart-subagents mode should normally stay within two or three specialists unless the Lead justifies more.")
+    if specialist_count > 0 and not coordination_packet_supplied:
+        warnings.append("Specialist dispatch should include a coordination packet: role assignments, read/write permissions, file ownership, evidence contract, stop conditions, and verification gate.")
     if "production_release" in classification_ids and not explicit_release_requested:
         blockers.append("Production/release-classified work requires explicit release approval before deploy/release actions.")
 
@@ -1449,6 +1665,7 @@ def tool_dispatch_check(args: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "goal": goal,
+        "teamMode": team_mode,
         "valid": not blockers,
         "blockers": blockers,
         "warnings": warnings,
@@ -1456,8 +1673,10 @@ def tool_dispatch_check(args: dict[str, Any]) -> dict[str, Any]:
         "specialistCount": specialist_count,
         "maxSpecialists": max_specialists,
         "leadJustification": explicit_justification,
+        "coordinationPacketSupplied": coordination_packet_supplied,
         "agents": agents,
         "blockedActions": team_blocked_actions(),
+        "coordinationProtocol": TEAM_COORDINATION_PROTOCOL,
         "policy": TEAM_DISPATCH_POLICY,
     }
 
@@ -1985,28 +2204,31 @@ TOOLS: dict[str, dict[str, Any]] = {
         "readOnlyHint": True,
     },
     "gstack_team_plan": {
-        "description": "Create a lead-agent plus specialist-team dispatch plan for a goal, including roles, evidence requirements, and anti-swarm safety rules.",
+        "description": "Create a lead-agent, smart-subagents, or full-team dispatch plan for a goal, including roles, coordination packet, evidence requirements, and anti-swarm safety rules.",
         "inputSchema": {
             "type": "object",
             "required": ["goal"],
             "properties": {
                 "goal": {"type": "string"},
                 "quality_level": {"type": "string", "enum": ["standard", "enterprise"], "default": "enterprise"},
+                "team_mode": {"type": "string", "enum": ["auto", "single-lead", "smart-subagents", "full-team"], "default": "auto"},
             },
         },
         "handler": tool_team_plan,
         "readOnlyHint": True,
     },
     "gstack_dispatch_check": {
-        "description": "Validate a proposed multi-agent dispatch plan for lead accountability, max specialist count, write-scope overlap, and blocked actions.",
+        "description": "Validate a proposed multi-agent dispatch plan for lead accountability, coordination packet, max specialist count, write-scope overlap, and blocked actions.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "goal": {"type": "string"},
+                "team_mode": {"type": "string", "enum": ["auto", "single-lead", "smart-subagents", "full-team"], "default": "auto"},
                 "team": {"type": "object", "description": "Object containing an agents array, usually from gstack_team_plan."},
                 "agents": {"type": "array", "items": {"type": "object"}, "description": "Alternative direct agent list."},
                 "max_specialists": {"type": "integer", "minimum": 1, "maximum": 10, "default": 3},
                 "lead_justification": {"type": "string"},
+                "coordination_packet_supplied": {"type": "boolean", "default": False},
                 "explicit_release_requested": {"type": "boolean", "default": False},
             },
         },

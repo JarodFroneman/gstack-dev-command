@@ -100,6 +100,49 @@ def main() -> int:
         },
         {
             "jsonrpc": "2.0",
+            "id": 11,
+            "method": "tools/call",
+            "params": {
+                "name": "jstack_team_plan",
+                "arguments": {
+                    "goal": "Build a production feature with the full JStack team",
+                    "quality_level": "enterprise",
+                    "team_mode": "full-team",
+                },
+            },
+        },
+        {
+            "jsonrpc": "2.0",
+            "id": 12,
+            "method": "tools/call",
+            "params": {
+                "name": "jstack_dispatch_check",
+                "arguments": {
+                    "goal": "Build a production feature with the full JStack team",
+                    "team_mode": "full-team",
+                    "coordination_packet_supplied": True,
+                    "explicit_release_requested": True,
+                    "max_specialists": 10,
+                    "team": {
+                        "agents": [
+                            {"id": "lead", "readOnly": False, "writeScope": ["."], "task": "Orchestrate and synthesize."},
+                            {"id": "architect", "readOnly": True, "task": "Review architecture."},
+                            {"id": "investigator", "readOnly": True, "task": "Trace current behavior."},
+                            {"id": "builder", "readOnly": False, "writeScope": ["src/feature"], "task": "Implement bounded scope."},
+                            {"id": "reviewer", "readOnly": True, "task": "Review diff."},
+                            {"id": "qa", "readOnly": True, "task": "Verify tests."},
+                            {"id": "security", "readOnly": True, "task": "Review trust boundary."},
+                            {"id": "devops", "readOnly": True, "task": "Review release readiness."},
+                            {"id": "product", "readOnly": True, "task": "Review product workflow."},
+                            {"id": "quant", "readOnly": True, "task": "Review quant/data risk if applicable."},
+                            {"id": "docs", "readOnly": True, "task": "Prepare handoff notes."}
+                        ]
+                    }
+                },
+            },
+        },
+        {
+            "jsonrpc": "2.0",
             "id": 7,
             "method": "tools/call",
             "params": {
@@ -213,10 +256,23 @@ def main() -> int:
             structured = response["result"]["structuredContent"]
             assert structured["team"]["agents"]
             assert "dispatchPolicy" in structured["team"]
+            assert "coordinationProtocol" in structured["team"]
         if message["id"] == 6:
             structured = response["result"]["structuredContent"]
             assert structured["valid"] is True
             assert "blockedActions" in structured
+        if message["id"] == 11:
+            structured = response["result"]["structuredContent"]
+            assert structured["team"]["mode"] == "full-team"
+            assert structured["team"]["specialistCount"] == 10
+            assert len(structured["team"]["agents"]) == 11
+            assert structured["team"]["coordinationProtocol"]["mode"] == "full-team"
+            assert structured["coordinationProtocol"]["coreRule"].startswith("Full team means")
+        if message["id"] == 12:
+            structured = response["result"]["structuredContent"]
+            assert structured["valid"] is True
+            assert structured["teamMode"] == "full-team"
+            assert structured["coordinationPacketSupplied"] is True
         if message["id"] == 7:
             structured = response["result"]["structuredContent"]
             assert "requiredChecks" in structured

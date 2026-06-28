@@ -50,6 +50,7 @@ Legacy `gstack.*` policy files are also accepted for migration compatibility.
 
 Templates live in `templates/`:
 
+- `agent_coordination_protocol.md`
 - `jstack.enterprise.json`
 - `jstack.enterprise.yml`
 - `pull_request_template.md`

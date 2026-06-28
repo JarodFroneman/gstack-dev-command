@@ -1,24 +1,50 @@
-# /jstack-subagents
+---
+description: Run JStack with the right specialist subagent team
+argument-hint: [GOAL]
+---
 
-Run JStack with the right specialist subagent team for the current task.
+Apply the custom JStack enterprise development workflow to this task.
 
-## Arguments
+Goal:
+$ARGUMENTS
 
-- `goal`: the task or project objective to execute.
+Mode: `smart-subagents`.
 
-## Workflow
+The user invoked `/jstack-subagents`, which is explicit approval to deploy
+subagents for this task when multi-agent tools are available.
 
-1. Treat this command as explicit user approval to deploy subagents when multi-agent tools are available.
-2. Use the Lead Engineer plus the right specialist team, normally two or three specialists.
-3. For normal feature or bug work, use Code Investigator plus Reviewer.
-4. For phase, milestone, or project work, use Code Investigator plus Reviewer, adding QA when verification risk is meaningful.
-5. For architecture, API, database, or integration work, use Architect, Code Investigator, and Reviewer.
-6. For UI/product work, use Product / UX Reviewer, QA Engineer, and Reviewer.
-7. For security/compliance work, use Security Engineer, Reviewer, and QA Engineer.
-8. For production/release/deploy work, use DevOps / Release Engineer, Security Engineer, and QA Engineer.
-9. For trading, EA, quant, or backtest work, use Quant / Backtest Reviewer, Reviewer, and QA Engineer.
-10. Use `jstack_team_plan` and `jstack_dispatch_check` when available before spawning several specialists or assigning file edits.
+Use the Lead Engineer plus the right specialist team, normally 2-3 specialists:
 
-## Guardrails
+- For normal feature/bug work: Code Investigator + Reviewer.
+- For phase/milestone/project work: Code Investigator + Reviewer, plus QA when
+  verification risk is meaningful.
+- For architecture/API/database/integration work: Architect + Code Investigator
+  + Reviewer.
+- For UI/product work: Product / UX Reviewer + QA Engineer + Reviewer.
+- For security/compliance work: Security Engineer + Reviewer + QA Engineer.
+- For production/release/deploy work: DevOps / Release Engineer + Security
+  Engineer + QA Engineer.
+- For trading/EA/quant/backtest work: Quant / Backtest Reviewer + Reviewer +
+  QA Engineer.
 
-Specialists are read-only by default. Only a Builder may edit, and only inside an explicitly assigned disjoint write scope. If multi-agent tools are unavailable, write `No subagents deployed:` with the concrete reason, then continue with the single-lead enterprise workflow.
+Before spawning several specialists or assigning any file edits, create a
+coordination packet:
+
+- goal
+- risk class
+- roles used and why
+- roles skipped and why
+- read/write permissions
+- file ownership map
+- evidence contract
+- stop conditions
+- verification gate
+
+Use `jstack_team_plan` with `team_mode="smart-subagents"` and
+`jstack_dispatch_check` with `team_mode="smart-subagents"` and
+`coordination_packet_supplied=true` when available. Specialists are read-only
+by default. Only a Builder may edit, and only inside an explicitly assigned
+disjoint write scope.
+
+If multi-agent tools are unavailable, write `No subagents deployed:` and give
+the concrete reason, then continue with the single-lead enterprise workflow.

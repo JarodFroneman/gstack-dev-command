@@ -13,7 +13,7 @@
 1. Classify task risk.
 2. Restore context and read project instructions.
 3. Create an enterprise plan.
-4. Build a team plan when risk justifies specialists.
+4. Build a team plan and coordination packet when risk justifies specialists.
 5. Run policy and preflight checks.
 6. Implement the smallest coherent change.
 7. Review, test, QA, and security-check proportionally to risk.
@@ -23,6 +23,8 @@
 ## Production Controls
 
 - policy-as-code
+- agent coordination packet
+- file ownership map
 - protected-path checks
 - diff hygiene
 - test command discovery

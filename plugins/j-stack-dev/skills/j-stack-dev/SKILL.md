@@ -17,4 +17,7 @@ Default behavior:
 4. If `jstack_*` tools are unavailable, fall back to the installed upstream `gstack-*` skills and normal Codex workflow.
 5. Respect project `AGENTS.md`, safety rules, branch/deploy rules, and explicit user approvals.
 
+If the task grows beyond a single Lead Engineer, stop and recommend
+`/jstack-subagents` or `/jstack-full-team` rather than silently escalating.
+
 This command is for substantial development work. Tiny one-line fixes may use normal Codex workflow.

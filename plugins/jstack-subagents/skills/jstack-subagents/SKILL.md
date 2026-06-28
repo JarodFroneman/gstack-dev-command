@@ -22,4 +22,22 @@ Default behavior:
 9. Use Quant / Backtest Reviewer for trading, EA, quant, or backtest work.
 10. Specialists are read-only by default. Only assign edits to a Builder with a disjoint write scope.
 
+Before dispatch, require a coordination packet:
+
+- goal
+- risk class
+- roles used and why
+- roles skipped and why
+- read/write permissions
+- file ownership map
+- evidence contract
+- conflict rule
+- stop conditions
+- verification gate
+- handoff gate
+
+No two editing agents may own the same file or module. If scope cannot be split
+cleanly, use one Builder. The Lead Engineer resolves conflicts using evidence,
+reproduction, project rules, and safety gates.
+
 If multi-agent tools are unavailable, state `No subagents deployed:` with the concrete reason, then continue with the single-lead enterprise workflow.

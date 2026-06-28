@@ -93,6 +93,60 @@ dispatched only when their review materially reduces risk or increases speed.
   "multi-agent tools unavailable", "task reclassified as trivial", or "user
   requested single-agent mode".
 
+### Agent Coordination Protocol
+
+Full team means complete professional coverage, not uncontrolled concurrency.
+Before deploying several specialists or using `/jstack-full-team`, the Lead
+Engineer must produce or internally maintain a coordination packet with:
+
+- goal: the user objective in one sentence
+- risk class: trivial, normal, architecture, UI/product, security,
+  data/financial, or release
+- mode: single-lead, smart-subagents, or full-team
+- roles used: exact agents used and why each is necessary
+- roles not used: skipped specialists and why, unless full-team mode accounts
+  for all 11 roles
+- read/write permissions: who may edit and who is read-only
+- file ownership map: path or module ownership for every editing agent
+- evidence contract: what each specialist must return
+- conflict rule: how contradictory findings are resolved
+- stop conditions: what forces pause or escalation
+- verification gate: tests, QA, screenshots, logs, security, release, or
+  backtest checks required
+- handoff gate: final summary and residual-risk requirements
+
+Default permissions:
+
+- Lead Engineer: orchestrator; may edit.
+- Builder: may edit only assigned disjoint implementation scope.
+- Documentation / Handoff Writer: may edit docs only when assigned.
+- All other specialists: read-only.
+
+File ownership rules:
+
+- No two editing agents may own the same file or module.
+- Shared files require Lead Engineer ownership or explicit serialization.
+- Specialists may not edit outside their assigned write scope.
+- A file ownership conflict blocks dispatch until resolved.
+- If the scope cannot be split cleanly, use one Builder.
+
+Conflict resolution:
+
+- Evidence beats opinion.
+- Reproduction beats speculation.
+- Project rules beat generic best practice.
+- Safety gates beat speed.
+- The Lead Engineer decides and documents unresolved risk.
+
+Full-team wave pattern:
+
+1. Discovery wave: Architect, Code Investigator, Product/UX or Quant when
+   relevant.
+2. Build wave: Builder only after the Lead approves scope.
+3. Review wave: Reviewer, QA, Security, DevOps, Documentation.
+4. Synthesis wave: Lead reconciles evidence, resolves conflicts, verifies, and
+   hands off.
+
 ### Anti-swarm controls
 
 - Do not spawn agents just to create activity.
