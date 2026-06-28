@@ -1,0 +1,39 @@
+{
+  "name": "jstack-subagents",
+  "version": "0.1.0+codex.20260628062228",
+  "description": "Top-level JStack command that deploys the right specialist subagent team.",
+  "author": {
+    "name": "Jarod Froneman",
+    "url": "https://github.com/JarodFroneman"
+  },
+  "homepage": "https://github.com/JarodFroneman/jstack",
+  "repository": "https://github.com/JarodFroneman/jstack",
+  "license": "MIT",
+  "keywords": [
+    "jstack",
+    "codex",
+    "subagents",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "JStack Subagents",
+    "shortDescription": "Deploy the right team, normally two or three specialists",
+    "longDescription": "Top-level Codex command for JStack specialist-team mode. This command is explicit approval to use the right subagent team for the task when multi-agent tools are available, while keeping the Lead Engineer accountable for synthesis and delivery.",
+    "developerName": "Jarod Froneman",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Deploy the right JStack specialist team."
+    ],
+    "websiteURL": "https://github.com/JarodFroneman/jstack",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "brandColor": "#1F6FEB",
+    "screenshots": []
+  }
+}

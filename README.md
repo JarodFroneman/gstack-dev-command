@@ -20,6 +20,11 @@ as implementation building blocks where useful.
 - `plugin/` - installable Codex plugin package for universal slash commands.
 - `plugin/commands/` - global `/j-stack-dev`, `/jstack-subagents`, and
   `/jstack-full-team` command definitions.
+- `plugins/j-stack-dev/` - top-level alias plugin that exposes `/j-stack-dev`.
+- `plugins/jstack-subagents/` - top-level alias plugin that exposes
+  `/jstack-subagents`.
+- `plugins/jstack-full-team/` - top-level alias plugin that exposes
+  `/jstack-full-team`.
 - `prompts/j-stack-dev.md` - single-lead slash command.
 - `prompts/jstack-subagents.md` - smart specialist-team slash command.
 - `prompts/jstack-full-team.md` - full-team slash command.
@@ -62,6 +67,13 @@ and docs should use `jstack_*`.
 This is the preferred install path. It makes the commands available globally in
 Codex threads and projects through the plugin command registry.
 
+Codex currently exposes the plugin name itself as a top-level slash command.
+For that reason this repo ships both:
+
+- the umbrella `jstack` plugin, which appears as `/jstack`; and
+- three alias plugins, which appear as `/j-stack-dev`, `/jstack-subagents`,
+  and `/jstack-full-team`.
+
 On this machine the plugin is registered from the personal marketplace at:
 
 ```text
@@ -74,6 +86,9 @@ Install or refresh it with:
 python C:\Users\TE05\.codex\skills\.system\plugin-creator\scripts\validate_plugin.py C:\Users\TE05\plugins\jstack
 python C:\Users\TE05\.codex\skills\.system\plugin-creator\scripts\update_plugin_cachebuster.py C:\Users\TE05\plugins\jstack
 & C:\Users\TE05\AppData\Roaming\npm\codex.cmd plugin add jstack@personal
+& C:\Users\TE05\AppData\Roaming\npm\codex.cmd plugin add j-stack-dev@personal
+& C:\Users\TE05\AppData\Roaming\npm\codex.cmd plugin add jstack-subagents@personal
+& C:\Users\TE05\AppData\Roaming\npm\codex.cmd plugin add jstack-full-team@personal
 ```
 
 After installing, restart Codex or open a new thread so the command registry

@@ -1,0 +1,39 @@
+{
+  "name": "jstack-full-team",
+  "version": "0.1.0+codex.20260628062228",
+  "description": "Top-level JStack command that deploys the full 11-role team.",
+  "author": {
+    "name": "Jarod Froneman",
+    "url": "https://github.com/JarodFroneman"
+  },
+  "homepage": "https://github.com/JarodFroneman/jstack",
+  "repository": "https://github.com/JarodFroneman/jstack",
+  "license": "MIT",
+  "keywords": [
+    "jstack",
+    "codex",
+    "full-team",
+    "subagents"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "JStack Full Team",
+    "shortDescription": "Deploy the full 11-role JStack team",
+    "longDescription": "Top-level Codex command for full JStack team mode. This command is explicit approval to deploy the full 11-role team when multi-agent tools are available, or to apply the full-team review rubric manually when they are not.",
+    "developerName": "Jarod Froneman",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Deploy the full 11-role JStack team."
+    ],
+    "websiteURL": "https://github.com/JarodFroneman/jstack",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "brandColor": "#1F6FEB",
+    "screenshots": []
+  }
+}

@@ -1,0 +1,25 @@
+---
+name: jstack-subagents
+description: JStack specialist-team workflow. Use when the user invokes /jstack-subagents or explicitly asks to deploy the right subagent team, normally two or three specialists.
+metadata:
+  short-description: Deploy the right JStack specialist team
+---
+
+# JStack Subagents
+
+Treat this command as explicit user approval to deploy subagents when multi-agent tools are available.
+
+Default behavior:
+
+1. Keep the Lead Engineer accountable for scope, synthesis, implementation decisions, verification, and handoff.
+2. Deploy the right specialist team for the task, normally two or three specialists.
+3. Use Code Investigator plus Reviewer for normal feature or bug work.
+4. Add QA Engineer when verification risk is meaningful.
+5. Use Architect for architecture, API, database, or integration-sensitive work.
+6. Use Product / UX Reviewer for UI and product work.
+7. Use Security Engineer for security or compliance work.
+8. Use DevOps / Release Engineer for production, deploy, and release work.
+9. Use Quant / Backtest Reviewer for trading, EA, quant, or backtest work.
+10. Specialists are read-only by default. Only assign edits to a Builder with a disjoint write scope.
+
+If multi-agent tools are unavailable, state `No subagents deployed:` with the concrete reason, then continue with the single-lead enterprise workflow.

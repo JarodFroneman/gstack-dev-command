@@ -1,0 +1,39 @@
+{
+  "name": "j-stack-dev",
+  "version": "0.1.0+codex.20260628062228",
+  "description": "Top-level JStack single Lead Engineer command for Codex.",
+  "author": {
+    "name": "Jarod Froneman",
+    "url": "https://github.com/JarodFroneman"
+  },
+  "homepage": "https://github.com/JarodFroneman/jstack",
+  "repository": "https://github.com/JarodFroneman/jstack",
+  "license": "MIT",
+  "keywords": [
+    "jstack",
+    "codex",
+    "workflow",
+    "engineering"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "JStack Dev",
+    "shortDescription": "Single Lead Engineer workflow, no subagents by default",
+    "longDescription": "Top-level Codex command for the standard JStack development workflow. Use this for substantial engineering work where one Lead Engineer applies the enterprise Think, Plan, Build, Review, Test, Ship structure without deploying subagents by default.",
+    "developerName": "Jarod Froneman",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Run the JStack single Lead Engineer workflow."
+    ],
+    "websiteURL": "https://github.com/JarodFroneman/jstack",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "brandColor": "#1F6FEB",
+    "screenshots": []
+  }
+}
